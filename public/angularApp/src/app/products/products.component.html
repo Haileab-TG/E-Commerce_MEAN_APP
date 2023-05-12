@@ -1,0 +1,8 @@
+<ul>
+    <li *ngFor="let product of products">
+        <div>
+            <a routerLink="/product/{{product._id}}">{{product.title}}</a>
+            <button (click)="deleteOneRequest(product._id)">Delete</button>
+        </div>
+    </li>
+</ul>

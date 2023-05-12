@@ -1,0 +1,19 @@
+<form [formGroup]="_productFormGroup" (ngSubmit)="onSubmitProduct()">
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input formControlName="title" type="text" class="form-control" placeholder="Title">
+    </div>
+    <div class="form-group">
+        <label for="price">Price</label>
+        <input formControlName="price" type="number" step="0.5" class="form-control" placeholder="Price">
+    </div>
+
+    <div class="form-group">
+        <input (change)="onFileSelect($event)" type="file" accept="image/png, image/jpeg" class="custom-file-input" id="image">
+        <label class="custom-file-label " for="customFile">Upload Image</label>
+    </div>
+    <button>Add</button> 
+    <p>{{_missingRequired}}</p>
+
+
+</form>
