@@ -25,7 +25,7 @@ const _updateOne = function (req, res, makeUpdate) {
 const partialUpdateOne = function (req, res) {
     const makePartialUpdate = function (product) {
         return new Promise((resolve) => {
-            if (req.body.title) product.title = req.body.title;
+            if (req.body.name) product.title = req.body.name;
             if (req.body.price) product.price = req.body.price;
             if (req.body.img) product.img = req.body.img;
             resolve(product);
@@ -37,7 +37,7 @@ const partialUpdateOne = function (req, res) {
 const fullUpdateOne = function (req, res) {
     const makeFullUpdate = function (product) {
         return new Promise((resolve) => {
-            product.title = req.body.title;
+            product.name = req.body.name;
             product.price = req.body.price;
             product.img = req.body.img;
             resolve(product);
@@ -85,7 +85,7 @@ const getAll = function (req, res) {
 const addOne = function (req, res) {
     const response = _intializeResponse()
     const newProduct = {
-        title: req.body.title,
+        name: req.body.name,
         price: req.body.price,
         img: req.body.img,
     };

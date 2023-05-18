@@ -11,12 +11,9 @@ import { HomeComponent } from './home/home.component';
 import { ProductsComponent } from './products/products.component';
 import { SingleProductComponent } from './single-product/single-product.component';
 import { ErrorComponent } from './error/error.component';
-import { ChildComponent } from './child/child.component';
-import { ParentComponent } from './parent/parent.component';
 import { routes } from './routes';
-import { ReactiveFormComponent } from './reactive-form/reactive-form.component';
-import { TemplateFormsComponent } from './template-forms/template-forms.component';
 import { AddProductComponent } from './add-product/add-product.component';
+import { UpdateProductComponent } from './update-product/update-product.component';
 
 
 @NgModule({
@@ -28,11 +25,8 @@ import { AddProductComponent } from './add-product/add-product.component';
     ProductsComponent,
     SingleProductComponent,
     ErrorComponent,
-    ChildComponent,
-    ReactiveFormComponent,
-    ParentComponent,
-    TemplateFormsComponent,
     AddProductComponent,
+    UpdateProductComponent,
 
   ],
   imports: [

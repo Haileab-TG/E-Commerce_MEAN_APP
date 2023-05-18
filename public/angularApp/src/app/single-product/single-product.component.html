@@ -1,3 +1,12 @@
-<h1>{{_product.title}}</h1>
-<p>Price: {{_product.price | currency: '$'}}</p>
-<button (click)="goToAddProducts()">Add</button>
+<div class="horizontal">
+    <div >
+        <h1>{{_product.name}}</h1>
+        <p>{{_product.price | currency: '$'}}</p>
+    </div>
+    <div class="buttons">
+        <button (click)="goToEdit()" type="button" class="btn btn-outline-success mr-4">Edit</button>
+        <button (click)="delete()" type="button" class="btn btn-outline-danger">Delete</button>
+    </div>
+</div>
+
+<img src="{{_product.img}}">

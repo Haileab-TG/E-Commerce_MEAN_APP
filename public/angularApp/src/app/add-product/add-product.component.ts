@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ProductsDataService } from '../products-data.service';
+import { Router } from '@angular/router';
 
 @Component({
 	selector: 'app-add-product',
@@ -9,41 +10,19 @@ import { ProductsDataService } from '../products-data.service';
 })
 export class AddProductComponent {
 	_productFormGroup: FormGroup = new FormGroup({
-		title: new FormControl('', Validators.required),
+		name: new FormControl('', Validators.required),
 		price: new FormControl('', Validators.required),
+		img: new FormControl('')
 	});
-	_formData : FormData = new FormData();
-	_missingRequired! : string;
 
-	constructor(private _productsService: ProductsDataService){}
+	constructor(private _productsService: ProductsDataService, private _router: Router){}
 
-	onSubmitProduct() {
-		if(this._productFormGroup.valid){
-			this._formData.append("title", this._productFormGroup.value.title);
-			this._formData.append("price", this._productFormGroup.value.price);
-			console.log(this._productFormGroup.value);
-			this._missingRequired = '';
-			console.log(this._formData);
-			this._productsService.addProduct(this._formData).subscribe({
+	addOne() {
+		console.log("hello")
+			this._productsService.addProduct(this._productFormGroup.value).subscribe({
 				next: (res)=>{console.log(res)},
 				error: (err)=>{console.log(err)},
-				complete:()=>{console.log("Product post completed")}
+				complete:()=> this._router.navigate(['products'])
 			});
-		}else{
-			this._missingRequired = "Please fill title and price!"
-		}
-		
 	}
-
-	onFileSelect(event: Event) {
-
-		const img : File | null = (event.target as HTMLInputElement).files!.item(0);
-		if(img){
-			this._formData.append("image", img, img.name);
-		}
-		console.log("file saved to be uploaded", img);
-	}
-
-
-
 }

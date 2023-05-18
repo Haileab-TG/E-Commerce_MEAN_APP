@@ -2,15 +2,53 @@ import { Component } from '@angular/core';
 
 import { ProductsDataService } from '../products-data.service';
 
+export class Review{
+	#title:string;
+	#rating:number;
+	#description:string;
+
+	constructor(title:string, rating:number, description: string){
+		this.#title = title;
+		this.#rating = rating;
+		this.#description = description;
+	}
+
+	set title(title:string){
+		this.#title = title;
+	}
+	set rating(rating:number){
+		this.#rating = rating;
+	}
+	set description(description: string){
+		this.#description = description;
+	}
+
+	get title(){
+		return this.#title;
+	}
+	get rating(){
+		return this.#rating;
+	}
+	get description(){
+		return this.#description;
+	}
+
+
+}
+
 export class Product {
 	#_id:string;
-	#title: string;
+	#name: string;
 	#price: number;
+	#img: string;
+	#review: Review[];
 
-	constructor(id: string, title: string, price: number) {
+	constructor(id: string, name: string, price: number, img: string, review:Review[]) {
 		this.#_id = id;
-		this.#title = title;
+		this.#name = name;
 		this.#price = price;
+		this.#img = img;
+		this.#review = review;
 	}
 
 	set _id(id: string) {
@@ -21,12 +59,12 @@ export class Product {
 		return this.#_id;
 	}
 
-	set title(title: string) {
-		this.#title = title;
+	set name(name: string) {
+		this.#name = name;
 	}
 
-	get title() {
-		return this.#title;
+	get name() {
+		return this.#name;
 	}
 
 	set price(price: number) {
@@ -36,7 +74,26 @@ export class Product {
 	get price() {
 		return this.#price;
 	}
+
+	set img(img: string) {
+		this.#img = img;
+	}
+
+	get img() {
+		return this.#img;
+	}
+
+	set review(review: Review[]) {
+		this.#review = review;
+	}
+
+	get review() {
+		return this.#review;
+	}
 }
+
+
+
 
 @Component({
 	selector: 'app-products',
@@ -45,20 +102,14 @@ export class Product {
 })
 export class ProductsComponent  {
 
-	products!: Product[] ;
+	products!: Product[];
+	offset:number= 0;
+	count: number = 5;
 
 	constructor(private _productsService: ProductsDataService){}
 
-	deleteOneRequest(id:string){
-		this._productsService.deleteProduct(id).subscribe({
-			next: (res) =>  {console.log("delete success", res);},
-			error: (err) => {console.log("delete err", err);},
-			complete: () => {this.getAllRequest();}
-		});
-	}
-
 	getAllRequest(){
-		this._productsService.getProducts().subscribe({
+		this._productsService.getProducts(this.offset, this.count).subscribe({
 			next: (products)=> {this.products = products},
 			error: (err)=> {console.log("getAll error",err);},
 			complete: ()=>{}
@@ -70,7 +121,15 @@ export class ProductsComponent  {
 	}
 
 
+	next(){
+		this.offset += this.count;
+		this.ngOnInit();
+	}
 
+	previous(){
+		this.offset -= this.count;
+		this.ngOnInit();
+	}
 
 
 }

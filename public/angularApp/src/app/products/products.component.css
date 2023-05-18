@@ -1,5 +1,18 @@
-div{
+img{
+    width: 10%;
+    height: 10%;
+}
+
+p{
+    color: black;
+}
+
+button{
+    width: 9%;
+}
+
+.pagination{
     display: flex;
-    justify-content: space-around;
-    width: 25%;
+    justify-content: space-between;
+    margin: 2% 3% 2% 3%;
 }

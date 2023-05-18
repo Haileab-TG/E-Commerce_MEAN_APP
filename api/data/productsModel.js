@@ -12,7 +12,7 @@ const reviewsSchema = mongoose.Schema({
         max: 4,
         default: 1
     },
-    text: {
+    description: {
         type:String
     }
 });
@@ -24,10 +24,6 @@ const productSchema = mongoose.Schema(
             required: true
         },
         price:{
-            type:Number,
-            required: true
-        },
-        real_price:{
             type:Number,
             required: true
         },

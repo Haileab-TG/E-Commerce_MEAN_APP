@@ -1,8 +1,16 @@
 <ul>
     <li *ngFor="let product of products">
-        <div>
-            <a routerLink="/product/{{product._id}}">{{product.title}}</a>
-            <button (click)="deleteOneRequest(product._id)">Delete</button>
+        <div class="product">
+            <a routerLink="/product/{{product._id}}">
+                <img src="{{product.img}}"/> 
+              <p> {{product.name}}  {{product.price | currency:"$"}}</p> 
+            </a>
         </div>
     </li>
 </ul>
+
+<div class="pagination">
+    <button (click)="previous()" [disabled]="offset==0" type="button" class="btn btn-outline-dark ">Privous</button>
+    <button (click)="next()" type="button" class="btn btn-outline-dark ">Next</button>
+</div>
+

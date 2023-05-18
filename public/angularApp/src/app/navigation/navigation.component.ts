@@ -17,4 +17,8 @@ export class NavigationComponent{
 		this._router.navigate(["products"]);
 	}
 
+	goToAddProduct(){
+		this._router.navigate(['addProduct'])
+	}
+
 }

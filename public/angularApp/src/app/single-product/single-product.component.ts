@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { ProductsDataService } from '../products-data.service';
-import { Product } from '../products/products.component';
+import { Product, Review } from '../products/products.component';
 
 
 
@@ -16,11 +16,18 @@ export class SingleProductComponent implements OnInit {
   _product : Product;
 
   constructor(private _router: Router, private _route: ActivatedRoute, private _productService: ProductsDataService){
-    this._product = new Product("","",0);
+    this._product = new Product("", "", 0, "", [new Review("", 0, "")]);
   }
 
-  goToAddProducts(){
-    this._router.navigate(["addProduct"])
+  delete(){
+    this._productService.deleteProduct(this._product._id).subscribe({
+      error: (err)=>console.log(err),
+      complete: ()=> this._router.navigate(['products'])
+    });
+  }
+
+  goToEdit(){
+    this._router.navigate(['updateProduct/'+ this._product._id])
   }
 
   ngOnInit(): void {

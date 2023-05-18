@@ -12,20 +12,25 @@ export class ProductsDataService {
 
 	constructor(private _http: HttpClient) { }
 
-	getProducts() : Observable<Product[]> {
-		return this._http.get<Product[]>(this._baseURL);
+	getProducts(offset:number, count:number) : Observable<Product[]> {
+		const url = this._baseURL + "?count="+count + "&offset="+ offset;
+		return this._http.get<Product[]>(url);
 	}
 
 	getProduct(id: string) : Observable<Product>{
 		return this._http.get<Product>(this._baseURL + "/" + id);
 	}
 
-	addProduct(product: FormData): Observable<object>{
-		return	this._http.post(this._baseURL, product);
+	addProduct(product: Product): Observable<Product>{
+		return	this._http.post<Product>(this._baseURL, product);
 	}
 
-	deleteProduct(id: string) : Observable<object>{
-		return this._http.delete(this._baseURL + "/" + id);
+	deleteProduct(id: string) : Observable<Product>{
+		return this._http.delete<Product>(this._baseURL + "/" + id);
+	}
+
+	fullUpdateProduct(id: string, product:Product): Observable<Product>{
+		return this._http.put<Product>(this._baseURL + "/" + id, product);
 	}
 
 
