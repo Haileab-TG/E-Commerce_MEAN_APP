@@ -1,38 +1,37 @@
 const mongoose = require("mongoose");
 require("./productsModel")
 
-mongoose.set('strictQuery', true);
 mongoose.connect(
-    "mongodb://127.0.0.1:27017/mean_eCommerce", 
+    process.env.DB_URL, 
     {useNewUrlParser: true, useUnifiedTopology: true}
 );
 
-mongoose.connection.on("connected", function(){
-    console.log("Connected to DB");
+mongoose.connection.on(process.env.DB_CONNECTED_EVENT, function(){
+    console.log(process.env.DB_CONNECTED_MSG);
 });
 
-mongoose.connection.on("disconnected", function(){
-    console.log("DB disconnected");
+mongoose.connection.on(process.env.DB_DISCONNECTED_EVENT, function(){
+    console.log(process.env.DB_DISCONNECTED_MSG);
 });
 
-mongoose.connection.on("error", function(err){
-    console.log("dbConnection_err", err);
+mongoose.connection.on(process.env.DB_ERROR_EVENT, function(err){
+    console.log(process.env.DB_CONNECTION_ERROR_MSG, err);
 });
 
-process.on("SIGINT", function(){
+process.on(process.env.SIGNAL_INTERRUPTION_EVENT, function(){
     mongoose.disconnect(function(){
         process.exit(0);
     });
 });
 
-process.on("SIGTERM", function(){
+process.on(process.env.SIGNAL_TERMINATION_EVENT, function(){
     mongoose.disconnect(function(){
         process.exit(0);
     });
 });
 
-process.once("SIGUSR2", function(){
+process.once(process.env.SIGNAL_USR2_EVENT, function(){
     mongoose.disconnect(function(){
-        process.kill(process.pid, "SIGUSR2");
+        process.kill(process.pid, process.env.SIGNAL_USR2_EVENT);
     });
 });

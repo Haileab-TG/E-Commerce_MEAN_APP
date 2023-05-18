@@ -19,7 +19,7 @@ const reviewsSchema = mongoose.Schema({
 
 const productSchema = mongoose.Schema(
     {
-        title: {
+        name: {
             type:String,
             required: true
         },
@@ -27,10 +27,11 @@ const productSchema = mongoose.Schema(
             type:Number,
             required: true
         },
-        image:{
-            type:Buffer,
-            contentType: String
+        real_price:{
+            type:Number,
+            required: true
         },
+        img:String,
         reviews: {
             type: [reviewsSchema],
             default: []
@@ -39,4 +40,4 @@ const productSchema = mongoose.Schema(
     }
 );
 
-mongoose.model("Product", productSchema, "products");
+mongoose.model(process.env.DB_MODEL_NAME, productSchema, process.env.DB_COLLECTION_NAME);

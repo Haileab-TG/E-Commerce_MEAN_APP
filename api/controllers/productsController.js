@@ -1,119 +1,98 @@
-const mongoose= require("mongoose");
-const Product= mongoose.model(process.env.Product_MODEL);
+const mongoose = require("mongoose");
+const Product = mongoose.model(process.env.Product_MODEL);
+const {
+        _intializeResponse, 
+        _checkExistance,
+        _save,
+        _sendResponse,
+        _setAppropriateErrorResponse,
+        _setOKResponse,
+    } = require("./controllerUtil");
 
-const _updateOne = function(req, res, makeUpdate){
+
+const _updateOne = function (req, res, makeUpdate) {
+    const response = _intializeResponse()
     const productId = req.params.productId;
-    Product.findById(productId, function(err, product){
-        if(err){
-            console.log(partialUpdateOne.name, err);
-            res.status(500).json(err);
-        }else if(!product){
-            res.status(400).send("Incorrect ID");
-        }else{
-            makeUpdate(product);
-            product.save(function(err, updatedProduct){
-                if(err){
-                    console.log(partialUpdateOne.name, err);
-                    res.status(500).json(err);
-                }else{
-                    res.status(200).json(updatedProduct);
-                }
-            });
-        }
-    });
+    Product.findById(productId)
+        .then((product) => _checkExistance(product))
+        .then((product) => makeUpdate(product))
+        .then((product) => _save(product))
+        .then((updatedProduct) => _setOKResponse(response, updatedProduct))
+        .catch((error) => _setAppropriateErrorResponse(response, error))
+        .finally(() => _sendResponse(res, response));
 }
 
-
-const partialUpdateOne = function(req, res){
-    const makePartialUpdate = function(product){
-        if(req.body.title) product.title = req.body.title;
-        if(req.body.price) product.price = req.body.price;
-        if(req.body.image) product.image = req.body.image;
+const partialUpdateOne = function (req, res) {
+    const makePartialUpdate = function (product) {
+        return new Promise((resolve) => {
+            if (req.body.title) product.title = req.body.title;
+            if (req.body.price) product.price = req.body.price;
+            if (req.body.img) product.img = req.body.img;
+            resolve(product);
+        });
     }
-    _updateOne(req, res, makePartialUpdate);  
+    _updateOne(req, res, makePartialUpdate);
 }
-
 
 const fullUpdateOne = function (req, res) {
-    const makeFullUpdate = function(product){
-        product.title = req.body.title;
-        product.price = req.body.price;
-        product.image = req.body.image;
+    const makeFullUpdate = function (product) {
+        return new Promise((resolve) => {
+            product.title = req.body.title;
+            product.price = req.body.price;
+            product.img = req.body.img;
+            resolve(product);
+        });
     }
     _updateOne(req, res, makeFullUpdate);
 }
 
-
-
 const deleteOne = function (req, res) {
+    const response = _intializeResponse();
     const productId = req.params.productId;
-    
-    Product.findByIdAndDelete(productId).exec(function (err, deletedProduct) {
-        let response = { status: 204, message: deletedProduct };
-        if (err) {
-            console.log("Error finding product");
-            response.status = 500;
-            response.message = err;
-        } else if (!deletedProduct) {
-            console.log("Product id not found");
-            response.status = 404;
-            response.message = {
-            "message": "Product ID not found"
-            };
-        }
-        res.status(response.status).json(response.message);
-    });
+    Product.findByIdAndDelete(productId)
+        .then((deletedProduct) => _checkExistance(deletedProduct))
+        .then((deletedProduct) => _setOKResponse(response, deletedProduct))
+        .catch((error) => _setAppropriateErrorResponse(response, error))
+        .finally(() => _sendResponse(res, response));
 }
 
-const getOne= function(req, res) {
-    console.log(req.url);
-    const productId= req.params.productId;
-    Product.findById(productId).exec(function(err, product) {
-        if(err){
-            console.log("getOne_err", err);
-            res.status(500).send("Something went wrong");
-        }else{
-            res.status(200).json(product);
-        }
-    });
+const getOne = function (req, res) {
+    const response = _intializeResponse();
+    const productId = req.params.productId;
+    Product.findById(productId)
+        .then((product) => _checkExistance(product))
+        .then((product) => _setOKResponse(response, product))
+        .catch((error) => _setAppropriateErrorResponse(response, error))
+        .finally(() => _sendResponse(res, response));
 }
 
-const getAll = function(req, res){
+const getAll = function (req, res) {
     let offset = 0;
     let count = 5;
+    const response = _intializeResponse()
     if (req.query && req.query.offset) {
-            offset= parseInt(req.query.offset);
+        offset = parseInt(req.query.offset);
     }
     if (req.query && req.query.count) {
-        count= parseInt(req.query.count);
+        count = parseInt(req.query.count);
     }
-    Product.find().skip(offset).limit(count).exec(function(err, products) {
-        if(err){
-            console.log("getAll_err", err);
-            res.status(500).send("Something went wrong");
-        }else{
-            res.status(200).json(products);
-        }
-       
-    });
-};
-
-const addOne = function(req, res){
-    const newProduct = {
-        title: req.body.title, 
-        price: req.body.price, 
-        image: req.body.image, 
-    };
-    console.log(req.body);
-    res.status(200).send("okay dockey");
-    // Product.create(newProduct, function(err, product){
-    //     if(err){
-    //         console.log("addOne_err", err);
-    //         res.status(500).json(err);
-    //     }else{
-    //         res.status(200).json(product);
-    //     }
-    // })
+    Product.find().skip(offset).limit(count)
+        .then((prodcuts) => _setOKResponse(response, prodcuts))
+        .catch((error) => _setAppropriateErrorResponse(response, error))
+        .finally(()=>_sendResponse(res, response));
 }
 
-exports = module.exports = {getAll, addOne, getOne, deleteOne,  fullUpdateOne, partialUpdateOne}
+const addOne = function (req, res) {
+    const response = _intializeResponse()
+    const newProduct = {
+        title: req.body.title,
+        price: req.body.price,
+        img: req.body.img,
+    };
+    Product.create(newProduct)
+        .then((storedProduct) => _setOKResponse(response, storedProduct))
+        .catch((error) => _setAppropriateErrorResponse(response, error))
+        .finally(()=>_sendResponse(res, response));
+}
+
+exports = module.exports = { getAll, addOne, getOne, deleteOne, fullUpdateOne, partialUpdateOne }
