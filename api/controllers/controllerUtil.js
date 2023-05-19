@@ -23,6 +23,7 @@ const _setNotFoundErrorResponse = function (response) {
 }
 
 const _setAppropriateErrorResponse = function (response, error) {
+    console.log(error);
     if (error.code == 404) {
         _setNotFoundErrorResponse(response);
     } else {

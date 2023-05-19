@@ -1,22 +1,33 @@
 const mongoose= require("mongoose");
 const Product= mongoose.model(process.env.Product_MODEL);
+const {
+    _checkExistance,
+    _save,
+    _intializeResponse,
+    _setAppropriateErrorResponse,
+    _setOKResponse,
+    _sendResponse
+} = require("./controllerUtil");
+const {
+    _checkReview,
+    _getPaginatedReviews,
+    _pushReview,
+    _removeReview,
+    _saveThenReturnReview,
+} = require("./reviewControllerUtil");
+
 
 const getOne= function(req, res) {
     const productId= req.params.productId;
     const reviewId= req.params.reviewId;
-    Product.findById(productId).exec(function(err, product) {
-        if(err){
-            console.log("Review_GetOne_err", err);
-            res.status(500).send("Something went wrong");
-        }else{
-            const review = product.reviews.id(reviewId);
-            if(review){
-                res.status(200).json(review);
-            }else{
-                res.status(404).send("Review not found");
-            }
-        }
-    });
+    const response = _intializeResponse();
+
+    Product.findById(productId)
+        .then((product) => _checkExistance(product))
+        .then((product)=> _checkReview(product, reviewId))
+        .then((productAndReviewObj) => _setOKResponse(response, productAndReviewObj.review))
+        .catch((error)=> _setAppropriateErrorResponse(response, error))
+        .finally(()=>_sendResponse(res, response));
 }
 
 const getAll= function(req, res) {
@@ -29,56 +40,87 @@ const getAll= function(req, res) {
         count= parseInt(req.query.count);
     }
     const productId= req.params.productId;
-    Product.findById(productId).select("reviews").exec(function(err, product) {
-        if(err){
-            console.log("Review_GetAll_Err", err);
-            res.status(500).send("Something went wrong");
-        }else{
-            res.status(200).json(product.reviews.slice(offset, offset + count));
-        }
-    });
+    const response = _intializeResponse();
+    Product.findById(productId)
+        .then((product)=>_checkExistance(product))
+        .then((product) => _getPaginatedReviews(count, offset, product))
+        .then((reviews)=> _setOKResponse(response, reviews))
+        .catch((error) => _setAppropriateErrorResponse(error))
+        .finally(()=>_sendResponse(res, response));
 }
 
-const _addReview= function (req, res, product) {
-    const newReview = {
-        title: req.body.title, 
-        rating: req.body.rating, 
-        text: req.body.text
-    };
-    product.reviews.push(newReview);
-    product.save(function(err, updatedProduct) {
-        const response= { status: 200, message: [] };
-        if (err) {
-            response.status= 500;
-            response.message= err;
-        } else {
-            response.status= 201;
-            response.message= updatedProduct.reviews;
-        }
-        res.status(response.status).json(response.message);
-    });
-}
-
-const addOne= function(req, res) {
+const addOne = function(req, res) {
     const productId= req.params.productId;
-    Product.findById(productId).select("reviews").exec(function(err, product) {
-    console.log("Foun a product ", product);
-    const response= { status: 200, message: product };
-    if (err) {
-        console.log("Error finding product");
-        response.status= 500;
-        response.message= err;
-    } else if (!product) {
-        console.log("Error finding product");
-        response.status= 404;
-        response.message= {"message": "product ID not found "+productId};
-    }
-    if (product) {
-        _addReview(req, res, product);
-    } else {
-        res.status(response.status).json(response.message);
-    }
-    });
+    const response = _intializeResponse()
+    Product.findById(productId)
+        .then((product) => _checkExistance(product))
+        .then((product) => _pushReview(req, product))
+        .then((product) => _save(product))
+        .then((product) => _setOKResponse(response, product))
+        .catch((error) => _setAppropriateErrorResponse(response, error))
+        .finally(()=> _sendResponse(res, response));
 }
 
-module.exports = exports = {addOne, getAll, getOne}
+const deleteOne = function (req, res) {
+    const productId= req.params.productId;
+    const reviewId= req.params.reviewId;
+    const response = _intializeResponse();
+
+    Product.findById(productId)
+        .then((product) => _checkExistance(product))
+        .then((product)=> _checkReview(product, reviewId))
+        .then((productAndReviewObj) => _removeReview(productAndReviewObj))
+        .then((productAndReviewObj)=> _saveThenReturnReview(productAndReviewObj))
+        .then((review)=>_setOKResponse(response, review))
+        .catch((error)=> _setAppropriateErrorResponse(error))
+        .finally(()=> _sendResponse(res, response));
+}
+
+const _updateOne = function (req, res, makeUpdate) {
+    const response = _intializeResponse()
+    const productId = req.params.productId;
+    const reviewId = req.params.reviewId;
+    Product.findById(productId)
+        .then((product) => _checkExistance(product))
+        .then((product)=>_checkReview(product, reviewId))
+        .then((productAndReviewObj) => makeUpdate(productAndReviewObj))
+        .then((productAndReviewObj)=> _saveThenReturnReview(productAndReviewObj))
+        .then((review) => _setOKResponse(response, review))
+        .catch((error) => _setAppropriateErrorResponse(response, error))
+        .finally(() => _sendResponse(res, response));
+}
+
+const partialUpdateOne = function (req, res) {
+    const makePartialUpdate = function (productAndReviewObj) {
+        const {product, review} = productAndReviewObj;
+        return new Promise((resolve) => {
+            if (req.body.title) review.title = req.body.title;
+            if (req.body.rating) review.rating = req.body.rating;
+            if (req.body.description) review.description = req.body.description;
+            resolve(productAndReviewObj);
+        });
+    }
+    _updateOne(req, res, makePartialUpdate);
+}
+
+const fullUpdateOne = function (req, res) {
+    const makeFullUpdate = function (productAndReviewObj) {
+        return new Promise((resolve) => {
+            const {review} = productAndReviewObj;
+            review.title = req.body.title;
+            review.rating = req.body.rating;
+            review.description = req.body.description;
+            resolve(productAndReviewObj);
+        });
+    }
+    _updateOne(req, res, makeFullUpdate);
+}
+
+module.exports = exports = {
+    addOne,
+    getAll,
+    getOne, 
+    deleteOne, 
+    fullUpdateOne, 
+    partialUpdateOne
+}

@@ -12,9 +12,8 @@ const reviewsSchema = mongoose.Schema({
         max: 4,
         default: 1
     },
-    description: {
-        type:String
-    }
+    description:String
+    
 });
 
 const productSchema = mongoose.Schema(

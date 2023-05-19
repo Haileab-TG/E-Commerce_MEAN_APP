@@ -25,7 +25,7 @@ const _updateOne = function (req, res, makeUpdate) {
 const partialUpdateOne = function (req, res) {
     const makePartialUpdate = function (product) {
         return new Promise((resolve) => {
-            if (req.body.name) product.title = req.body.name;
+            if (req.body.name) product.name = req.body.name;
             if (req.body.price) product.price = req.body.price;
             if (req.body.img) product.img = req.body.img;
             resolve(product);
@@ -95,4 +95,11 @@ const addOne = function (req, res) {
         .finally(()=>_sendResponse(res, response));
 }
 
-exports = module.exports = { getAll, addOne, getOne, deleteOne, fullUpdateOne, partialUpdateOne }
+exports = module.exports = { 
+    getAll, 
+    addOne, 
+    getOne, 
+    deleteOne, 
+    fullUpdateOne, 
+    partialUpdateOne 
+}
