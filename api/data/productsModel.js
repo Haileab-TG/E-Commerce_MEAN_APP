@@ -8,7 +8,7 @@ const reviewsSchema = mongoose.Schema({
     rating:{
         type: Number,
         required: true,
-        min: 1,
+        min: 0,
         max: 4,
         default: 1
     },

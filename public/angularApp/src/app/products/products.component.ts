@@ -1,13 +1,17 @@
 import { Component } from '@angular/core';
 
 import { ProductsDataService } from '../products-data.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { environment } from 'src/environments/environment';
 
 export class Review{
+	#_id: string;
 	#title:string;
 	#rating:number;
 	#description:string;
 
-	constructor(title:string, rating:number, description: string){
+	constructor(id: string, title:string, rating:number, description: string){
+		this.#_id = id;
 		this.#title = title;
 		this.#rating = rating;
 		this.#description = description;
@@ -22,6 +26,9 @@ export class Review{
 	set description(description: string){
 		this.#description = description;
 	}
+	set _id(id: string){
+		this.#_id = id;
+	}
 
 	get title(){
 		return this.#title;
@@ -32,8 +39,9 @@ export class Review{
 	get description(){
 		return this.#description;
 	}
-
-
+	get _id(){
+		return this.#_id;
+	}
 }
 
 export class Product {
@@ -101,33 +109,44 @@ export class Product {
 	styleUrls: ['./products.component.css']
 })
 export class ProductsComponent  {
-
-	products!: Product[];
-	offset:number= 0;
-	count: number = 5;
+	_fb: FormBuilder = new FormBuilder();
+	_searchFormGroup: FormGroup = this._fb.group({
+		productName: [environment.EMPTY_STRING, Validators.required]
+	  });
+	_products!: Product[];
+	_offset:number= environment.PRODUCTS_OFFSET;
+	_count: number = environment.PRODUCTS_COUNT;
+	_hasMore!: boolean;
+	_productNameToSearch!:string;
 
 	constructor(private _productsService: ProductsDataService){}
 
-	getAllRequest(){
-		this._productsService.getProducts(this.offset, this.count).subscribe({
-			next: (products)=> {this.products = products},
-			error: (err)=> {console.log("getAll error",err);},
-			complete: ()=>{}
+	
+	search(){
+		this._productNameToSearch = this._searchFormGroup.value.productName;
+		this.getAllProducts();
+	}
+
+	getAllProducts(){
+		this._productsService.getAll(this._offset, this._count, this._productNameToSearch).subscribe({
+			next: (products)=> {this._products = products},
+			error: (error)=> {console.log(error);},
+			complete: ()=> this._hasMore = this._products.length >= this._count
 		});
 	}
 
 	ngOnInit() {
-		this.getAllRequest();
+		this.getAllProducts();
 	}
 
 
 	next(){
-		this.offset += this.count;
+		this._offset += this._count;
 		this.ngOnInit();
 	}
 
 	previous(){
-		this.offset -= this.count;
+		this._offset -= this._count;
 		this.ngOnInit();
 	}
 

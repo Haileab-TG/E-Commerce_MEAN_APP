@@ -16,6 +16,15 @@ const {
     _saveThenReturnReview,
 } = require("./reviewControllerUtil");
 
+const _calculateRatingAverage = function (product) {
+    return new Promise((resolve, reject)=>{
+        const {reviews} = product;
+        const sum = reviews.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+        const avg = 0;
+        if(reviews.length > 0) avg = sum/reviews.length;
+        resolve(avg);
+    });
+}
 
 const getOne= function(req, res) {
     const productId= req.params.productId;

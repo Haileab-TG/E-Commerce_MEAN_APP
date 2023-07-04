@@ -69,14 +69,12 @@ const getOne = function (req, res) {
 const getAll = function (req, res) {
     let offset = 0;
     let count = 5;
+    const predicator = {};
     const response = _intializeResponse()
-    if (req.query && req.query.offset) {
-        offset = parseInt(req.query.offset);
-    }
-    if (req.query && req.query.count) {
-        count = parseInt(req.query.count);
-    }
-    Product.find().skip(offset).limit(count)
+    if (req.query && req.query.offset) offset = parseInt(req.query.offset);
+    if (req.query && req.query.count)  count = parseInt(req.query.count);
+    if(req.query && req.query.productName && req.query.productName !== 'undefined') predicator.name = req.query.productName
+    Product.find(predicator).skip(offset).limit(count)
         .then((prodcuts) => _setOKResponse(response, prodcuts))
         .catch((error) => _setAppropriateErrorResponse(response, error))
         .finally(()=>_sendResponse(res, response));

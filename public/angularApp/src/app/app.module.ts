@@ -2,7 +2,9 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import {MatGridListModule} from '@angular/material/grid-list';
+import { JWT_OPTIONS, JwtHelperService, JwtModule } from "@auth0/angular-jwt";
 
 import { AppComponent } from './app.component';
 import { NavigationComponent } from './navigation/navigation.component';
@@ -14,6 +16,14 @@ import { ErrorComponent } from './error/error.component';
 import { routes } from './routes';
 import { AddProductComponent } from './add-product/add-product.component';
 import { UpdateProductComponent } from './update-product/update-product.component';
+import { ReviewsComponent } from './reviews/reviews.component';
+import { AddReviewComponent } from './add-review/add-review.component';
+import { SingleReviewComponent } from './single-review/single-review.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RegisterComponent } from './register/register.component';
+import { LoginComponent } from './login/login.component';
+import { AuthenticationIntercepterInterceptor } from './authentication-intercepter.interceptor';
+import { ProfileComponent } from './profile/profile.component';
 
 
 @NgModule({
@@ -27,6 +37,12 @@ import { UpdateProductComponent } from './update-product/update-product.componen
     ErrorComponent,
     AddProductComponent,
     UpdateProductComponent,
+    ReviewsComponent,
+    AddReviewComponent,
+    SingleReviewComponent,
+    RegisterComponent,
+    LoginComponent,
+    ProfileComponent,
 
   ],
   imports: [
@@ -34,9 +50,16 @@ import { UpdateProductComponent } from './update-product/update-product.componen
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
-    RouterModule.forRoot(routes)
+    MatGridListModule,
+    RouterModule.forRoot(routes),
+    BrowserAnimationsModule,
+    JwtModule,
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthenticationIntercepterInterceptor, multi: true },
+    { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
+        JwtHelperService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

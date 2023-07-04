@@ -1,24 +1,29 @@
 img{
-    width: 55%;
-    height: 55%;
+    width: 85%;
+    height: 85%;
 }
 
-.horizontal{
-    position: relative;
+.columns{
    display: flex;
-   flex-direction: row;
+   flex-direction: column;
    justify-content: space-between;
-   margin: 1.5%;
    border-color: red;
+   width: 25%;
 }
 
-.buttons{
-    width: 15%;
+.bigWidth{
+    width: 50%;
+}
+
+.rows{
     display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 2% 8% 0 0 ;
 }
 
-button{
-    width: 90%;
-    height: 40%;
+.btn{
+    width: 90px;
 }
+
 

@@ -18,15 +18,30 @@ const _setServerErrorResponse = function (response, error) {
 }
 
 const _setNotFoundErrorResponse = function (response) {
-    response.code = process.env.NOT_FOUND_CODE;
-    response.msg = { error: process.env.INCORRECT_ID_ERROR_MSG }
+     response.code = process.env.NOT_FOUND_CODE;
+     response.msg = {error: process.env.NOT_FOUND_ERROR_MSG}
+}
+
+const _setIncorrectCredentialErrorResponse = function (response) {
+    response.code = process.env.INCORRECT_CREDENTIALS_CODE;
+    response.msg = { error: process.env.INCORRECT_CREDENTIALS_MSG }
+}
+
+const _setMissingFieldsErrorResponse = function(response){
+    response.code = process.env.USER_ERROR_CODE;
+    response.msg = {error: process.env.MISSING_USER_INPUT_ERROR_MSG}
 }
 
 const _setAppropriateErrorResponse = function (response, error) {
-    console.log(error);
-    if (error.code == 404) {
+    console.log("throwed error", error)
+    if (error.code == 400) {
+        _setMissingFieldsErrorResponse(response);
+    } else if(error.code == 403){
+        _setIncorrectCredentialErrorResponse(response);
+    }else if(error.code == 404){
         _setNotFoundErrorResponse(response);
-    } else {
+    }
+    else {
         _setServerErrorResponse(response, error);
     }
 }
@@ -55,4 +70,5 @@ module.exports = {
     _sendResponse,
     _setAppropriateErrorResponse,
     _setOKResponse,
+    _setMissingFieldsErrorResponse
 }

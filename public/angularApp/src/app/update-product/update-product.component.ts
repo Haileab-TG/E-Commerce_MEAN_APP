@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductsDataService } from '../products-data.service';
 import { Product } from '../products/products.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-update-product',
@@ -12,19 +13,25 @@ import { Product } from '../products/products.component';
 export class UpdateProductComponent {
   _product!: Product;
   _productFormGroup: FormGroup = new FormGroup({
-		name: new FormControl('', Validators.required),
-		price: new FormControl('', Validators.required),
-		img: new FormControl('')
+		name: new FormControl(environment.EMPTY_STRING, Validators.required),
+		price: new FormControl(environment.EMPTY_STRING, Validators.required),
+		img: new FormControl(environment.EMPTY_STRING)
 	});
+  showAlert: boolean = false;
 
 	constructor(private _productsService: ProductsDataService, private _router: Router, private _activatedRoute: ActivatedRoute){}
 
 	fullUpdateOne() {
-			this._productsService.fullUpdateProduct(this._product._id, this._productFormGroup.value).subscribe({
-				error: (err)=>{console.log(err)},
-        complete: ()=> this._router.navigate(['product/' + this._product._id]),
+			this._productsService.fullUpdateOne(this._product._id, this._productFormGroup.value).subscribe({
+				error: (error)=>this.showErrorAlert(error),
+        complete: ()=> this._router.navigate([environment.SINGLE_PRODUCT_URL + '/' + this._product._id]),
 			});
 	}
+
+  showErrorAlert(error: any){
+    console.log(typeof error.status)
+    if(error.status = environment.UNAUTHORIZED_401_HTTP_CODE) this.showAlert = true;
+  }
 
   setFormValues(){
     this._productFormGroup.patchValue({
@@ -35,10 +42,10 @@ export class UpdateProductComponent {
   }
 
   ngOnInit(){
-    const productId:string = this._activatedRoute.snapshot.params['productId'];
-    this._productsService.getProduct(productId).subscribe({
+    const productId:string = this._activatedRoute.snapshot.params[environment.PRODUCT_ID];
+    this._productsService.getOne(productId).subscribe({
       next:(product)=> this._product = product,
-      error: (err)=> console.log(err),
+      error: (error)=> console.log(error),
       complete: ()=> this.setFormValues()
     });
   }

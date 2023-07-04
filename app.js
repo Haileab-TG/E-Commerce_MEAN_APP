@@ -10,8 +10,8 @@ app.use(express.urlencoded({extended: true}));
 
 app.use("/api", function(req, res, next){
     res.header('Access-Control-Allow-Origin','http://localhost:4200');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, x-requested-with, Accept');
-    res.header('Access-Control-Allow-Methods','DELETE, GET, POST, PUT');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, x-requested-with, Accept, authorization');
+    res.header('Access-Control-Allow-Methods','DELETE, GET, POST, PUT, PATCH');
     next();
 });
 

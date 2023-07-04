@@ -10,4 +10,7 @@
     </div>
 
     <button [disabled]="!_productFormGroup.valid" type="submit" class="btn btn-outline-success ">Add</button>
+    <div *ngIf="showAlert" class="alert alert-danger" role="alert">
+        You need to login first!
+    </div>
 </form>
